@@ -1,0 +1,108 @@
+@{
+    ViewData["Title"] = "Dashboard Overview";
+    Layout = "_AdminLayout";
+}
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs text-gray-500 mb-1">Total Sales</p>
+        <p class="text-2xl font-bold text-gray-900">₹@ViewBag.TotalSales.ToString("N0")</p>
+      </div>
+      <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+        <span class="text-orange-600 text-xl font-bold">₹</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs text-gray-500 mb-1">Total Orders</p>
+        <p class="text-2xl font-bold text-gray-900">@ViewBag.TotalOrders</p>
+      </div>
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl">
+        <i class="fa-solid fa-cart-shopping"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs text-gray-500 mb-1">Total Users</p>
+        <p class="text-2xl font-bold text-gray-900">@ViewBag.TotalUsers</p>
+      </div>
+      <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl">
+        <i class="fa-solid fa-users"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs text-gray-500 mb-1">Total Products</p>
+        <p class="text-2xl font-bold text-gray-900">@ViewBag.TotalProducts</p>
+      </div>
+      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl">
+        <i class="fa-solid fa-box-open"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="grid grid-cols-2 gap-6">
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <h3 class="font-bold text-gray-900 mb-4">Recent Orders</h3>
+    <div class="space-y-4">
+      @if (!((IEnumerable<shree_om.Models.Order>)ViewBag.RecentOrders).Any())
+      {
+          <p class="text-sm text-gray-500">No orders yet.</p>
+      }
+      else
+      {
+          @foreach (var order in (IEnumerable<shree_om.Models.Order>)ViewBag.RecentOrders)
+          {
+            <div class="flex justify-between items-center pb-4 border-b last:border-0 border-gray-100">
+              <div>
+                <p class="font-semibold text-sm text-gray-900">Order #@order.OrderNumber</p>
+                <p class="text-xs text-gray-500">@order.ItemCount items • ₹@order.TotalAmount.ToString("F2")</p>
+              </div>
+              <span class="text-xs px-3 py-1 rounded-full font-medium @(order.Status == "Delivered" ? "bg-green-100 text-green-700" : order.Status == "Processing" ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700")">
+                @(string.IsNullOrEmpty(order.Status) ? "Pending" : order.Status)
+              </span>
+            </div>
+          }
+      }
+    </div>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <h3 class="font-bold text-gray-900 mb-4">Low Stock Alerts</h3>
+    <div class="space-y-4">
+      @if (!((IEnumerable<shree_om.Models.Product>)ViewBag.LowStockProducts).Any())
+      {
+          <p class="text-sm text-gray-500">No inventory alerts.</p>
+      }
+      else
+      {
+          @foreach (var p in (IEnumerable<shree_om.Models.Product>)ViewBag.LowStockProducts)
+          {
+            <div class="flex justify-between items-center pb-4 border-b last:border-0 border-gray-100">
+              <div>
+                <p class="font-semibold text-sm text-gray-900">@p.Name</p>
+                <p class="text-xs text-gray-500">Only @p.Stock units left</p>
+              </div>
+              <a asp-action="EditProduct" asp-route-id="@p.Id" class="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 font-medium transition-colors">
+                Add Stock
+              </a>
+            </div>
+          }
+      }
+    </div>
+  </div>
+</div>

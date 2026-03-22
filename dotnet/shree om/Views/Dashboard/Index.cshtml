@@ -1,0 +1,63 @@
+@model shree_om.Models.User
+@{
+    ViewData["Title"] = "My Dashboard";
+    Layout = "_DashboardLayout";
+}
+
+<div class="mb-8">
+  <h2 class="text-2xl font-bold text-slate-800">Hello, @Model.FullName!</h2>
+  <p class="text-gray-500">Welcome back to your dashboard</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 transition-transform hover:-translate-y-1">
+    <div class="text-3xl font-bold text-orange-500 mb-2">@ViewBag.TotalOrders</div>
+    <div class="text-sm font-medium text-gray-500">Total Orders</div>
+  </div>
+  <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 transition-transform hover:-translate-y-1">
+    <div class="text-3xl font-bold text-orange-500 mb-2">@ViewBag.PendingOrders</div>
+    <div class="text-sm font-medium text-gray-500">Pending Orders</div>
+  </div>
+  <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 transition-transform hover:-translate-y-1">
+    <div class="text-3xl font-bold text-orange-500 mb-2">@ViewBag.WishlistItems</div>
+    <div class="text-sm font-medium text-gray-500">Wishlist Items</div>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+  <div class="px-6 py-4 border-b border-gray-100">
+    <h3 class="font-bold text-slate-800">Recent Orders</h3>
+  </div>
+  <div class="p-6">
+    @if (((IEnumerable<shree_om.Models.Order>)ViewBag.RecentOrders).Any())
+    {
+      <div class="space-y-4">
+        @foreach (var order in (IEnumerable<shree_om.Models.Order>)ViewBag.RecentOrders)
+        {
+          <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+             <div>
+               <div class="font-semibold text-slate-800">@order.OrderNumber</div>
+               <div class="text-sm text-gray-500 mt-0.5">@order.OrderDate.ToString("MM/dd/yyyy")</div>
+             </div>
+             <div class="flex items-center gap-6">
+               <div class="text-right">
+                 <div class="font-bold text-orange-500">₹@order.TotalAmount.ToString("N0")</div>
+                 <div class="text-xs text-gray-500 font-medium uppercase mt-0.5">@order.ItemCount Items</div>
+               </div>
+               <span class="px-3 py-1 text-xs font-semibold rounded-full @(order.Status == "Delivered" ? "bg-green-100 text-green-700" : order.Status == "Pending" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700")">
+                   @order.Status
+               </span>
+             </div>
+          </div>
+        }
+      </div>
+    }
+    else
+    {
+      <p class="text-center text-gray-500 py-4">No recent orders found.</p>
+    }
+    <div class="mt-6 text-center border-t border-gray-100 pt-6">
+      <a asp-action="Orders" class="text-orange-500 hover:text-orange-600 font-medium text-sm transition-colors">View all orders</a>
+    </div>
+  </div>
+</div>

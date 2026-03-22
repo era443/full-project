@@ -1,0 +1,52 @@
+@model IEnumerable<shree_om.Models.Order>
+@{
+    ViewData["Title"] = "My Orders";
+    Layout = "_DashboardLayout";
+}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+  <div class="mb-6">
+    <h2 class="text-xl font-bold text-slate-800">My Orders</h2>
+    <p class="text-gray-500 text-sm mt-1">View and track your previous orders</p>
+  </div>
+
+  @if (!Model.Any())
+  {
+      <div class="text-center py-12">
+          <i class="fa-solid fa-box-open text-6xl text-gray-200 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900">No orders yet</h3>
+          <p class="text-gray-500 mt-1">When you place orders, they will appear here.</p>
+          <a asp-controller="Products" asp-action="Index" class="mt-6 inline-block bg-orange-500 text-white px-6 py-2 rounded-md font-medium hover:bg-orange-600 transition-colors">Start Shopping</a>
+      </div>
+  }
+  else
+  {
+      <div class="space-y-6">
+          @foreach (var order in Model)
+          {
+              <div class="border border-gray-100 rounded-lg overflow-hidden transition-shadow hover:shadow-sm">
+                  <div class="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100">
+                      <div>
+                          <div class="font-bold text-slate-800">Order ID: @order.OrderNumber</div>
+                          <div class="text-sm text-gray-500 mt-1">Placed on @order.OrderDate.ToString("M/d/yyyy")</div>
+                      </div>
+                      <div class="flex items-center gap-6">
+                          <div class="text-right">
+                              <div class="font-bold text-orange-600 text-lg">₹@order.TotalAmount.ToString("N0")</div>
+                              <div class="text-xs text-gray-500 font-medium tracking-wide uppercase">@order.ItemCount Items</div>
+                          </div>
+                          <div class="flex flex-col gap-2 items-end">
+                              <span class="px-3 py-1 text-xs font-semibold rounded-full @(order.Status == "Delivered" ? "bg-green-100 text-green-700" : order.Status == "Pending" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700")">
+                                  @order.Status
+                              </span>
+                              <a href="/Invoice/@order.OrderNumber" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 border border-gray-200 rounded hover:bg-white transition-colors bg-gray-100 text-gray-700 decoration-none">
+                                  <i class="fa-solid fa-download"></i> PDF Invoice
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          }
+      </div>
+  }
+</div>

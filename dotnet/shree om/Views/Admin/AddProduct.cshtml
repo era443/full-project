@@ -1,0 +1,125 @@
+@model shree_om.Models.Product
+@{
+    ViewData["Title"] = "Add Product";
+    Layout = "_AdminLayout";
+    var categories = ViewBag.Categories as IEnumerable<shree_om.Models.Category>;
+}
+
+<div class="min-h-screen bg-gray-50 -m-8 p-8 font-sans">
+  <div class="max-w-4xl mx-auto px-6 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">Add New Product</h1>
+      <div class="text-sm text-gray-500">
+        <a asp-action="Products" class="hover:text-gray-700">Products</a>
+        <span class="mx-2">/</span>
+        <span class="text-orange-500">Add New</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form asp-action="AddProduct" method="post" enctype="multipart/form-data" class="bg-white rounded-lg border border-gray-200 p-6">
+      <div class="grid grid-cols-2 gap-6">
+        
+        <!-- Product Name -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
+          <input type="text" asp-for="Name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 bg-white" />
+        </div>
+
+        <!-- SKU -->
+        <div class="col-span-2 md:col-span-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">SKU</label>
+            <!-- ASP.NET doesn't have an explicit SKU property in the base Product model, mapping to an ad-hoc field or just name for UI parity -->
+            <input type="text" name="sku" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 bg-white" />
+        </div>
+
+        <!-- Category -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+          <select asp-for="CategoryId" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-500 bg-white appearance-none">
+            <option value="">Select Category</option>
+            @if(categories != null)
+            {
+                foreach(var cat in categories)
+                {
+                    <option value="@cat.Id">@cat.Name</option>
+                }
+            }
+          </select>
+        </div>
+
+        <!-- Stock -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Stock</label>
+          <input type="number" asp-for="Stock" min="0" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 bg-white" />
+        </div>
+
+        <!-- Price -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Price (₹)</label>
+          <input type="number" asp-for="Price" step="0.01" min="0" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 bg-white" />
+        </div>
+        
+        <!-- Empty column mapping to screenshot layout -->
+        <div class="col-span-2 md:col-span-1 hidden md:block"></div>
+
+        <!-- Product Image (File input) -->
+        <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+            <div class="flex flex-col gap-2">
+                <input type="file" name="imageFile" accept="image/*" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 bg-white" />
+                <input type="hidden" asp-for="ImageUrl" value="/images/products/dummy.jpg" />
+            </div>
+        </div>
+
+        <!-- Short Description -->
+        <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Short Description</label>
+            <input type="text" name="shortDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 bg-white" />
+        </div>
+
+        <!-- Full Description -->
+        <div class="col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Full Description</label>
+          <textarea asp-for="Description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-gray-900 bg-white"></textarea>
+        </div>
+
+        <!-- Material -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Material</label>
+          <select asp-for="Material" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-500 bg-white appearance-none">
+            <option value="">Select Material</option>
+            <option value="Stainless Steel">Stainless Steel</option>
+            <option value="Brass">Brass</option>
+            <option value="Zinc Alloy">Zinc Alloy</option>
+            <option value="Aluminum Alloy">Aluminum Alloy</option>
+          </select>
+        </div>
+
+        <!-- Finish -->
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Finish</label>
+          <select asp-for="Finish" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-500 bg-white appearance-none">
+            <option value="">Select Finish</option>
+            <option value="Chrome">Chrome</option>
+            <option value="Matt Black">Matt Black</option>
+            <option value="Gold">Gold</option>
+            <option value="Nickel">Nickel</option>
+            <option value="Antique">Antique</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+        <a asp-action="Products" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors bg-white">
+          Cancel
+        </a>
+        <button type="submit" class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors">
+          Create Product
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,193 @@
+@model shree_om.Models.ViewModels.ProductFilterViewModel
+@{
+    ViewData["Title"] = "Products – Shree Om Hardware";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Sidebar -->
+    <aside class="lg:col-span-1 bg-white p-4 rounded-md shadow-sm border border-gray-100 h-fit">
+      <form method="get" asp-action="Index" asp-controller="Products" id="filterForm">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-orange-500"><circle cx="12" cy="12" r="10" stroke="#F6873E" stroke-width="1.5"/></svg>
+          Filters
+        </h3>
+
+        <!-- Categories -->
+        <div class="mb-6">
+          <h4 class="font-medium flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L15 8H9L12 2Z" fill="#F6873E"/></svg>
+            Categories
+          </h4>
+          <ul class="mt-2 space-y-2 text-sm text-gray-700">
+            @foreach (var cat in Model.AllCategories)
+            {
+              <li class="flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="categories" value="@cat.Name" @(Model.SelectedCategories.Contains(cat.Name) ? "checked" : "") onchange="document.getElementById('filterForm').submit()" class="accent-orange-500 w-4 h-4 cursor-pointer" /> 
+                  @cat.Name
+                </label>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Price Range -->
+        <div class="mb-6">
+          <h4 class="font-medium">Price Range</h4>
+          <div class="mt-2 text-sm text-gray-600">₹0 <span class="float-right">₹5000</span></div>
+          <input type="range" name="maxPrice" min="0" max="5000" step="100" value="@(Model.MaxPrice ?? 5000)" oninput="document.getElementById('priceVal').textContent=this.value" onchange="document.getElementById('filterForm').submit()" class="w-full mt-3 accent-orange-500" />
+          <div class="mt-2 text-sm text-gray-800 font-semibold">₹<span id="priceVal">@(Model.MaxPrice ?? 5000)</span></div>
+        </div>
+
+        <!-- Material -->
+        <div class="mb-6">
+          <h4 class="font-medium flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="3" fill="#F6873E"/></svg>
+            Material
+          </h4>
+          <ul class="mt-2 space-y-2 text-sm text-gray-700">
+            @foreach (var mat in new[] { "Stainless Steel", "Brass", "Zinc Alloy", "Aluminum Alloy" })
+            {
+              <li>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="materials" value="@mat" @(Model.SelectedMaterials.Contains(mat) ? "checked" : "") onchange="document.getElementById('filterForm').submit()" class="accent-orange-500 w-4 h-4 cursor-pointer"/> 
+                  @mat
+                </label>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Finish -->
+        <div class="mb-6">
+          <h4 class="font-medium flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L20 8V16L12 22L4 16V8L12 2Z" fill="#F6873E"/></svg>
+            Finish
+          </h4>
+          <ul class="mt-2 space-y-2 text-sm text-gray-700">
+            @foreach (var fin in new[] { "Chrome", "Matt Black", "Gold", "Nickel", "Antique" })
+            {
+              <li>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="finishes" value="@fin" @(Model.SelectedFinishes.Contains(fin) ? "checked" : "") onchange="document.getElementById('filterForm').submit()" class="accent-orange-500 w-4 h-4 cursor-pointer"/> 
+                  @fin
+                </label>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Minimum Rating -->
+        <div class="mb-6">
+          <h4 class="font-medium flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.3L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.3Z" fill="#F6873E"/></svg>
+            Minimum Rating
+          </h4>
+          <select name="minRating" onchange="document.getElementById('filterForm').submit()" class="mt-2 w-full border border-gray-200 rounded px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
+            <option value="0" selected="@(Model.MinRating == 0)">All Ratings</option>
+            <option value="4" selected="@(Model.MinRating == 4)">4.0 & up</option>
+            <option value="3" selected="@(Model.MinRating == 3)">3.0 & up</option>
+            <option value="2" selected="@(Model.MinRating == 2)">2.0 & up</option>
+          </select>
+        </div>
+
+        <!-- Hidden sort and search keeping state -->
+        <input type="hidden" name="sort" value="@Model.Sort" />
+        <input type="hidden" name="search" value="@Model.Search" />
+
+        <a href="/Products" class="w-full block text-center border border-gray-200 hover:bg-gray-50 rounded py-2 text-sm transition-colors text-gray-800 font-medium">Clear All Filters</a>
+      </form>
+    </aside>
+
+    <!-- Main Products Area -->
+    <main class="lg:col-span-3">
+      @if (!string.IsNullOrEmpty(Model.Search))
+      {
+          <div class="mb-4 text-gray-600 bg-orange-50 p-3 rounded-lg border border-orange-100 flex justify-between items-center">
+              <p>Showing results for: <span class="font-semibold text-gray-900">"@Model.Search"</span></p>
+              <a href="/Products" class="text-orange-500 hover:text-orange-700 text-sm font-medium">Clear Search</a>
+          </div>
+      }
+
+      @if (!Model.Products.Any())
+      {
+         <div class="text-center py-10 text-gray-500">No products found matching your filters.</div>
+      }
+      else
+      {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          @foreach (var p in Model.Products)
+          {
+            <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col h-full justify-between border border-gray-100 hover:shadow-md transition-shadow">
+              <div>
+                <div class="relative">
+                  <a asp-controller="Products" asp-action="Detail" asp-route-id="@p.Id" class="block">
+                    @if (!string.IsNullOrEmpty(p.ImageUrl))
+                    {
+                      <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-44 object-cover rounded-md" />
+                    }
+                    else
+                    {
+                      <div class="w-full h-44 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+                        <i class="fa-solid fa-screwdriver-wrench text-4xl"></i>
+                      </div>
+                    }
+                  </a>
+                  
+                  <form asp-controller="Wishlist" asp-action="Add" method="post" class="absolute right-3 top-3">
+                    <input type="hidden" name="productId" value="@p.Id" />
+                    <!-- Using generic gray heart since we can't easily sync state per item here without extra view logic -->
+                    <button type="submit" class="p-1.5 rounded-full shadow-sm transition-colors bg-white text-gray-400 hover:text-orange-500">
+                      <i class="fa-solid fa-heart w-4 h-4 flex items-center justify-center"></i>
+                    </button>
+                  </form>
+
+
+                </div>
+
+                <a asp-controller="Products" asp-action="Detail" asp-route-id="@p.Id" class="no-underline">
+                  <h4 class="mt-3 text-sm font-medium text-slate-900 line-clamp-2 hover:text-orange-500 transition-colors">@p.Name</h4>
+                </a>
+
+                <div class="mt-2 flex items-center justify-between">
+                  <div>
+                    <div class="text-orange-600 font-extrabold text-lg">₹@p.Price.ToString("N0")</div>
+
+                  </div>
+
+                  <div class="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                    <div class="flex text-yellow-400">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Math.Round(p.Rating))
+                            {
+                                <i class="fa-solid fa-star"></i>
+                            }
+                            else
+                            {
+                                <i class="fa-regular fa-star text-gray-300"></i>
+                            }
+                        }
+                    </div>
+                    <span class="font-medium text-gray-700 ml-1">@p.Rating.ToString("0.0")</span>
+                    <span class="text-gray-400 text-[10px] ml-0.5">(@p.ReviewCount reviews)</span>
+                  </div>
+                </div>
+              </div>
+
+              <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-4">
+                <input type="hidden" name="productId" value="@p.Id" />
+                <input type="hidden" name="quantity" value="1" />
+                <button type="submit" class="w-full bg-orange-500 text-white font-semibold py-2 rounded-md hover:bg-orange-600 flex items-center justify-center gap-2 transition-colors shadow-sm text-sm">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  Add to Cart
+                </button>
+              </form>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+</div>

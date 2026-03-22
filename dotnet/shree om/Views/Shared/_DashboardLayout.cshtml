@@ -1,0 +1,65 @@
+@{
+    Layout = "_Layout";
+    var userInitial = User.Identity?.Name?.FirstOrDefault() ?? 'U';
+    var userName = User.Identity?.Name ?? "User";
+    var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower() ?? "index";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower() ?? "dashboard";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
+  <h1 class="text-3xl font-bold text-slate-800 mb-8">My Dashboard</h1>
+  
+  <div class="flex flex-col md:flex-row gap-8">
+    
+    <!-- Sidebar -->
+    <div class="w-full md:w-64 flex-shrink-0">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6 text-center">
+        <div class="w-20 h-20 bg-orange-500 rounded-full text-white flex items-center justify-center text-4xl font-bold mx-auto mb-4 uppercase">
+          @userInitial
+        </div>
+        <h3 class="font-bold text-slate-800 text-lg">@userName</h3>
+        <p class="text-sm text-gray-500">@userEmail</p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <nav class="flex flex-col p-2 space-y-1">
+          <a asp-controller="Dashboard" asp-action="Index" class="@(currentController == "dashboard" && currentAction == "index" ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-orange-50 hover:text-orange-600") flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors">
+            <i class="fa-solid fa-border-all w-5 h-5 text-center flex justify-center items-center"></i> Dashboard
+          </a>
+          
+          <a asp-controller="Dashboard" asp-action="Orders" class="@(currentController == "dashboard" && currentAction == "orders" ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-orange-50 hover:text-orange-600") flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors">
+            <i class="fa-solid fa-box-open w-5 h-5 text-center flex justify-center items-center"></i> My Orders
+          </a>
+          
+          <!-- Note: Wishlist has its own page and isn't nested under the dashboard layout but we link there -->
+          <a asp-controller="Wishlist" asp-action="Index" class="@(currentController == "wishlist" ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-orange-50 hover:text-orange-600") flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors">
+            <i class="fa-solid fa-heart w-5 h-5 text-center flex justify-center items-center"></i> Wishlist
+          </a>
+          
+          <a asp-controller="Dashboard" asp-action="Profile" class="@(currentController == "dashboard" && currentAction == "profile" ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-orange-50 hover:text-orange-600") flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors">
+            <i class="fa-solid fa-user w-5 h-5 text-center flex justify-center items-center"></i> Profile
+          </a>
+          
+          <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2 border-t border-gray-100">
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md text-red-500 hover:bg-red-50 transition-colors text-left text-center">
+              <i class="fa-solid fa-arrow-right-from-bracket w-5 h-5 text-center flex justify-center items-center"></i> Logout
+            </button>
+          </form>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="flex-1 w-full">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="mb-4 bg-green-50 text-green-700 p-4 rounded-md shadow-sm border border-green-100 font-medium flex items-center gap-2">
+                <i class="fa-solid fa-circle-check"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @RenderBody()
+    </div>
+
+  </div>
+</div>

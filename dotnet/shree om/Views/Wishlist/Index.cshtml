@@ -1,0 +1,65 @@
+@model IEnumerable<shree_om.Models.WishlistItem>
+@{
+    ViewData["Title"] = "My Wishlist";
+    Layout = "_DashboardLayout";
+}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-full">
+      <div class="p-6 border-b border-gray-100">
+        <h2 class="text-xl font-bold text-slate-800">My Wishlist</h2>
+        <p class="text-gray-500 text-sm mt-1">Products you saved for later</p>
+      </div>
+
+      @if (!Model.Any())
+      {
+        <div class="p-16 text-center flex flex-col items-center justify-center">
+          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
+            <i class="fa-solid fa-heart-crack text-3xl"></i>
+          </div>
+          <p class="text-gray-500 font-medium mb-6">Your wishlist is completely empty.</p>
+          <a asp-controller="Products" asp-action="Index" class="bg-orange-500 text-white px-6 py-2 rounded-md font-medium hover:bg-orange-600 transition-colors shadow-sm">
+            Discover Products
+          </a>
+        </div>
+      }
+      else
+      {
+        <div class="p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var item in Model)
+            {
+               <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative group">
+                    <form asp-action="Remove" method="post" class="absolute top-3 right-3 z-10">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="bg-white/90 backdrop-blur border border-gray-200 text-red-500 hover:text-red-700 w-8 h-8 rounded-full shadow-sm flex items-center justify-center hover:bg-red-50 transition-colors" title="Remove">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </form>
+                    <a asp-controller="Products" asp-action="Detail" asp-route-id="@item.ProductId" class="block aspect-[4/3] overflow-hidden bg-gray-50 relative">
+                        @if (!string.IsNullOrEmpty(item.Product?.ImageUrl)) {
+                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        } else {
+                            <div class="w-full h-full flex items-center justify-center"><i class="fa-solid fa-screwdriver-wrench text-4xl text-gray-300"></i></div>
+                        }
+                    </a>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                           <h3 class="font-bold text-gray-900 truncate pr-2">@item.Product?.Name</h3>
+                           <div class="text-sm font-bold text-slate-900">₹@(item.Product?.Price.ToString("N0"))</div>
+                        </div>
+                        <p class="text-xs text-gray-500 line-clamp-1 mb-4">@(item.Product?.Category?.Name ?? "Hardware")</p>
+                        
+                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <input type="hidden" name="quantity" value="1" />
+                            <button type="submit" class="w-full bg-slate-900 text-white font-medium py-2 rounded-md hover:bg-slate-800 transition-colors shadow-sm text-sm">
+                                Move to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+          </div>
+        </div>
+      }
+    </div>

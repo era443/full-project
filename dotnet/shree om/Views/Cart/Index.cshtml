@@ -1,0 +1,109 @@
+@model shree_om.Models.ViewModels.ShoppingCartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+@if (!Model.Items.Any())
+{
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center font-sans">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
+        <p class="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+        <a asp-controller="Products" asp-action="Index" class="inline-block bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors shadow-sm font-semibold">
+            Start Shopping
+        </a>
+    </div>
+}
+else
+{
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="mb-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded-md shadow-sm">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-4">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="flex gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 items-center">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.ProductName" class="w-24 h-24 object-cover rounded-md" />
+                        }
+                        else
+                        {
+                             <div class="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+                                 <i class="fa-solid fa-screwdriver-wrench text-2xl"></i>
+                             </div>
+                        }
+                        
+                        <div class="flex-1">
+                            <a asp-controller="Products" asp-action="Detail" asp-route-id="@item.ProductId">
+                                <h3 class="font-semibold text-slate-800 hover:text-orange-500 transition-colors">@item.ProductName</h3>
+                            </a>
+                            <div class="text-orange-600 font-bold mt-1">₹@item.Price.ToString("N0")</div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                                <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="m-0 p-0">
+                                     <input type="hidden" name="productId" value="@item.ProductId" />
+                                     <input type="hidden" name="quantity" value="@(item.Quantity - 1)" />
+                                     <button type="submit" class="px-3 py-1 bg-white text-gray-600 hover:bg-gray-100 transition-colors">-</button>
+                                </form>
+                                <span class="w-8 text-center text-sm font-medium text-gray-800">@item.Quantity</span>
+                                <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="m-0 p-0">
+                                     <input type="hidden" name="productId" value="@item.ProductId" />
+                                     <input type="hidden" name="quantity" value="@(item.Quantity + 1)" />
+                                     <button type="submit" class="px-3 py-1 bg-white text-gray-600 hover:bg-gray-100 transition-colors">+</button>
+                                </form>
+                            </div>
+                            <form asp-controller="Cart" asp-action="RemoveFromCart" method="post" class="m-0 p-0">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <button type="submit" class="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors" title="Remove item">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 sticky top-4">
+                    <h3 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4 mb-4">Order Summary</h3>
+                    
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Subtotal (@Model.Items.Sum(i => i.Quantity) items)</span>
+                            <span>₹@Model.CartTotal.ToString("N0")</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Shipping Estimate</span>
+                            <span>Calculated at checkout</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Tax Estimate</span>
+                            <span>Calculated at checkout</span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100 my-4 pt-4">
+                        <div class="flex justify-between font-bold text-lg text-gray-900">
+                            <span>Total</span>
+                            <span class="text-orange-600">₹@Model.CartTotal.ToString("N0")</span>
+                        </div>
+                    </div>
+
+                    <a asp-controller="Checkout" asp-action="Index" class="block w-full text-center bg-orange-500 text-white py-3 rounded-md hover:bg-orange-600 transition-colors font-semibold shadow-sm">
+                        Proceed to Checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,40 @@
+@{
+    ViewData["Title"] = "Payment Failed";
+}
+
+<div class="container py-5 text-center" style="max-width: 600px;">
+    <div class="mb-4">
+        <i class="fa-solid fa-circle-xmark text-danger" style="font-size: 5rem;"></i>
+    </div>
+    
+    <h1 class="display-4 mb-3 text-danger font-weight-bold">Payment Failed</h1>
+    
+    @if (ViewBag.OrderNumber != null)
+    {
+        <p class="lead text-muted mb-4">
+            We're sorry, but the payment for your order <strong>@ViewBag.OrderNumber</strong> could not be processed successfully.
+        </p>
+    }
+    else
+    {
+        <p class="lead text-muted mb-4">
+            We're sorry, but your payment could not be processed successfully.
+        </p>
+    }
+    
+    <div class="card border-0 shadow-sm mb-5 text-start bg-light">
+        <div class="card-body">
+            <h5 class="card-title text-danger"><i class="fa-solid fa-circle-info me-2"></i> What happened?</h5>
+            <p class="card-text text-muted mb-0">Your transaction might have been declined by your bank, or you cancelled the payment popup. Your order is safely saved in our system as 'Pending'. You can try paying again.</p>
+        </div>
+    </div>
+    
+    <div>
+        <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary px-4 py-2 rounded-pill me-2">
+            <i class="fa-solid fa-arrow-rotate-left me-2"></i>Try Again
+        </a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill">
+            <i class="fa-solid fa-house me-2"></i>Home
+        </a>
+    </div>
+</div>

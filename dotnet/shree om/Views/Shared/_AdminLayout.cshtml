@@ -1,0 +1,56 @@
+@{
+    Layout = "_Layout";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower() ?? "dashboard";
+}
+
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p class="text-sm text-gray-500 mt-1">Welcome back, @User.Identity?.Name</p>
+      </div>
+      <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+        <button type="submit" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </form>
+    </div>
+
+    <!-- Navigation Cards -->
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <a asp-action="Dashboard" class="block @(currentAction == "dashboard" ? "bg-orange-500 text-white border-orange-500" : "bg-white border text-gray-900 hover:bg-gray-50") p-6 rounded-lg transition-colors cursor-pointer border-gray-200">
+        <i class="fa-solid fa-arrow-trend-up text-xl mb-2 @(currentAction == "dashboard" ? "text-white" : "text-gray-700")"></i>
+        <h3 class="font-semibold text-sm">Dashboard</h3>
+      </a>
+      
+      <a asp-action="Products" class="block @(currentAction == "products" || currentAction == "addproduct" || currentAction == "editproduct" ? "bg-orange-500 text-white border-orange-500" : "bg-white border text-gray-900 hover:bg-gray-50") p-6 rounded-lg transition-colors cursor-pointer border-gray-200">
+        <i class="fa-solid fa-box-open text-xl mb-2 @(currentAction.Contains("product") ? "text-white" : "text-gray-700")"></i>
+        <h3 class="font-semibold text-sm">Products</h3>
+      </a>
+      
+      <a asp-action="Orders" class="block @(currentAction == "orders" ? "bg-orange-500 text-white border-orange-500" : "bg-white border text-gray-900 hover:bg-gray-50") p-6 rounded-lg transition-colors cursor-pointer border-gray-200">
+        <i class="fa-solid fa-cart-shopping text-xl mb-2 @(currentAction == "orders" ? "text-white" : "text-gray-700")"></i>
+        <h3 class="font-semibold text-sm">Orders</h3>
+      </a>
+      
+      <a asp-action="Users" class="block @(currentAction == "users" || currentAction == "adduser" || currentAction == "edituser" ? "bg-orange-500 text-white border-orange-500" : "bg-white border text-gray-900 hover:bg-gray-50") p-6 rounded-lg transition-colors cursor-pointer border-gray-200">
+        <i class="fa-solid fa-users text-xl mb-2 @(currentAction.Contains("user") ? "text-white" : "text-gray-700")"></i>
+        <h3 class="font-semibold text-sm">Users</h3>
+      </a>
+    </div>
+
+    <!-- Content Area -->
+    <div class="w-full">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="mb-6 bg-green-50 text-green-700 p-4 rounded-lg shadow-sm border border-green-200 font-medium flex items-center gap-2">
+                <i class="fa-solid fa-circle-check"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @RenderBody()
+    </div>
+
+  </div>
+</div>

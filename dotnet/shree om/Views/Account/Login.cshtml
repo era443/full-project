@@ -1,0 +1,110 @@
+@model shree_om.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login – Shree Om Hardware";
+    Layout = "_Layout";
+    var unverifiedEmail = TempData["UnverifiedEmail"]?.ToString();
+    var hasErrors = !ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0);
+}
+
+<div class="auth-page">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-success" style="max-width:480px; margin: 0 auto 16px;">
+            <i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>@TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {   
+        <div class="alert-danger" style="max-width:480px; margin: 0 auto 16px;">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i>@TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="auth-card">
+        <!-- Logo -->
+        <div class="auth-logo">
+            <div class="logo-box">SO</div>
+        </div>
+
+        <h2>Welcome Back</h2>
+        <p class="auth-sub">Login to your Shree Om Hardware account</p>
+
+        @if (hasErrors)
+        {
+            <div class="alert-danger" style="margin-bottom:16px;">
+                <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i>
+                @foreach (var state in ViewData.ModelState.Values)
+                {
+                    foreach (var error in state.Errors)
+                    {
+                        <span>@error.ErrorMessage</span>
+                    }
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(unverifiedEmail))
+        {
+            <div class="alert-warn" style="margin-bottom:14px;">
+                <i class="fa-solid fa-envelope" style="margin-right:6px;"></i>
+                Email not verified.
+                <form asp-controller="Account" asp-action="ResendVerification" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="email" value="@unverifiedEmail" />
+                    <button type="submit" class="link-orange" style="background:none;border:none;cursor:pointer;font-size:inherit;padding:0;">
+                        Resend verification email →
+                    </button>
+                </form>
+            </div>
+        }
+
+        <form asp-action="Login" asp-controller="Account" method="post" id="loginForm" novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+            <div class="form-group">
+                <label asp-for="Email">Email Address</label>
+                <input asp-for="Email" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <div class="password-wrap">
+                    <input asp-for="Password" type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
+                    <button type="button" class="toggle-pw" onclick="togglePw('loginPassword', this)" tabindex="-1">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-row">
+                <label class="form-check">
+                    <input asp-for="RememberMe" type="checkbox" />
+                    <span>Remember me</span>
+                </label>
+                <a asp-controller="Account" asp-action="ForgotPassword" class="link-orange">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-orange w-full">Login</button>
+        </form>
+
+        <div class="auth-divider">
+            Don't have an account? <a asp-controller="Account" asp-action="Register">Register Now</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePw(id, btn) {
+            var inp = document.getElementById(id);
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+            btn.querySelector('i').classList.toggle('fa-eye');
+            btn.querySelector('i').classList.toggle('fa-eye-slash');
+        }
+    </script>
+}

@@ -1,0 +1,15 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+A:\documents\repos\shree om\Controllers\CheckoutController.cs(88,30): warning CS0168: The variable 'ex' is declared but never used [A:\documents\repos\shree om\shree om.csproj]
+A:\documents\repos\shree om\Controllers\CheckoutController.cs(123,51): error CS0411: The type arguments for method 'AsyncEnumerable.FirstOrDefaultAsync<TSource>(IAsyncEnumerable<TSource>, Func<TSource, bool>, CancellationToken)' cannot be inferred from the usage. Try specifying the type arguments explicitly. [A:\documents\repos\shree om\shree om.csproj]
+A:\documents\repos\shree om\Controllers\CheckoutController.cs(119,21): warning CS0219: The variable 'keySecret' is assigned but its value is never used [A:\documents\repos\shree om\shree om.csproj]
+
+Build FAILED.
+
+A:\documents\repos\shree om\Controllers\CheckoutController.cs(88,30): warning CS0168: The variable 'ex' is declared but never used [A:\documents\repos\shree om\shree om.csproj]
+A:\documents\repos\shree om\Controllers\CheckoutController.cs(119,21): warning CS0219: The variable 'keySecret' is assigned but its value is never used [A:\documents\repos\shree om\shree om.csproj]
+A:\documents\repos\shree om\Controllers\CheckoutController.cs(123,51): error CS0411: The type arguments for method 'AsyncEnumerable.FirstOrDefaultAsync<TSource>(IAsyncEnumerable<TSource>, Func<TSource, bool>, CancellationToken)' cannot be inferred from the usage. Try specifying the type arguments explicitly. [A:\documents\repos\shree om\shree om.csproj]
+    2 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:09.73

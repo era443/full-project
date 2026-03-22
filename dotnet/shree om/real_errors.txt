@@ -1,0 +1,42 @@
+﻿
+A:\Sem 6\Project react 
+dotNet\React\Shree 
+Om\dotnet\shree om\Controll
+ers\ProductsController.cs(1
+11,33): error CS1061: 
+'ClaimsPrincipal' does not 
+contain a definition for 
+'FindFirstValue' and no 
+accessible extension 
+method 'FindFirstValue' 
+accepting a first argument 
+of type 'ClaimsPrincipal' 
+could be found (are you 
+missing a using directive 
+or an assembly reference?) 
+[A:\Sem 6\Project react 
+dotNet\React\Shree 
+Om\dotnet\shree om\shree 
+om.csproj]
+A:\Sem 6\Project react 
+dotNet\React\Shree 
+Om\dotnet\shree om\Controll
+ers\ProductsController.cs(1
+11,33): error CS1061: 
+'ClaimsPrincipal' does not 
+contain a definition for 
+'FindFirstValue' and no 
+accessible extension 
+method 'FindFirstValue' 
+accepting a first argument 
+of type 'ClaimsPrincipal' 
+could be found (are you 
+missing a using directive 
+or an assembly reference?) 
+[A:\Sem 6\Project react 
+dotNet\React\Shree 
+Om\dotnet\shree om\shree 
+om.csproj]
+    1 Error(s)
+
+

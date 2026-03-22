@@ -1,0 +1,140 @@
+@model shree_om.Models.Order
+@{
+    Layout = null;
+    var isCod = Model.PaymentMethod == "COD" || Model.PaymentMethod == "Cash on Delivery";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice - @Model.OrderNumber</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        @@media print {
+            body * { visibility: hidden; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; border: none !important; }
+            @@page { margin: 1cm; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="bg-white min-h-screen text-slate-800 p-8 font-sans max-w-4xl mx-auto print:p-0 print:min-h-0 print:bg-white shadow-xl">
+        <div class="print-area border rounded-lg p-8 print:border-none print:p-0 bg-white shadow-sm">
+            <div class="flex justify-between items-start border-b pb-6 mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-orange-600">Shree Om</h1>
+                    <p class="text-sm text-gray-500 mt-1">Hardware Manufacturing & Distribution</p>
+                    <p class="text-sm text-gray-500">123 Industrial Area, Phase 1</p>
+                    <p class="text-sm text-gray-500">contact@shreeom.com</p>
+                </div>
+                <div class="text-right">
+                    <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-wider">Invoice</h2>
+                    <p class="text-sm font-medium mt-1">Order #: @Model.OrderNumber.Split('-').Last().ToUpper()</p>
+                    <p class="text-sm text-gray-500">Date: @Model.OrderDate.ToShortDateString()</p>
+                    <p class="text-sm mt-2">
+                        <span class="inline-flex px-2 py-1 text-xs font-bold rounded @Html.Raw(Model.PaymentStatus == "Successful" || Model.Status == "Delivered" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800")">
+                            @if (isCod && Model.Status != "Delivered")
+                            {
+                                <text>UNPAID (COD)</text>
+                            }
+                            else
+                            {
+                                <text>PAID</text>
+                            }
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Billed To / Shipping Address</h3>
+                    <p class="font-semibold">@(string.IsNullOrEmpty(Model.CustomerName) ? "Customer" : Model.CustomerName)</p>
+                    <p class="text-sm text-gray-600 mt-1">@Model.ShippingAddress</p>
+                    <p class="text-sm text-gray-600">@Model.City, @Model.PostalCode</p>
+                    <p class="text-sm text-gray-600">@Model.Country</p>
+                </div>
+                <div class="text-right">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Payment Info</h3>
+                    <p class="text-sm">@(isCod ? "Cash on Delivery" : "Razorpay")</p>
+                    @if (!isCod && !string.IsNullOrEmpty(Model.PaymentId))
+                    {
+                        <p class="text-xs text-gray-500 font-mono mt-1">Txn: @Model.PaymentId</p>
+                    }
+                </div>
+            </div>
+
+            <table class="w-full text-left border-collapse mb-8">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="py-3 px-4 font-semibold text-gray-700">Item</th>
+                        <th class="py-3 px-4 font-semibold text-gray-700 text-center">Qty</th>
+                        <th class="py-3 px-4 font-semibold text-gray-700 text-right">Price</th>
+                        <th class="py-3 px-4 font-semibold text-gray-700 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @if (Model.OrderItems != null && Model.OrderItems.Any())
+                    {
+                        foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td class="py-4 px-4">
+                                    <p class="font-medium text-gray-800">@item.Name</p>
+                                </td>
+                                <td class="py-4 px-4 text-center">@item.Quantity</td>
+                                <td class="py-4 px-4 text-right">₹@item.Price.ToString("N0")</td>
+                                <td class="py-4 px-4 text-right font-medium">₹@((item.Price * item.Quantity).ToString("N0"))</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="py-4 px-4">
+                                <p class="font-medium text-gray-800 italic text-gray-400">Legacy Aggregated Items</p>
+                            </td>
+                            <td class="py-4 px-4 text-center">@Model.ItemCount</td>
+                            <td class="py-4 px-4 text-right">N/A</td>
+                            <td class="py-4 px-4 text-right font-medium">₹@Model.TotalAmount.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="flex justify-end border-t pt-6">
+                <div class="w-64">
+                    <div class="flex justify-between mb-2 text-sm text-gray-600">
+                        <span>Subtotal</span>
+                        <span>₹@Model.TotalAmount.ToString("N0")</span>
+                    </div>
+                    <div class="flex justify-between mb-2 text-sm text-gray-600">
+                        <span>Shipping</span>
+                        <span>₹0</span>
+                    </div>
+                    <div class="flex justify-between border-t pt-2 mt-2">
+                        <span class="font-bold text-gray-800">Total</span>
+                        <span class="font-bold text-orange-600 text-xl">₹@Model.TotalAmount.ToString("N0")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center text-sm text-gray-400 border-t pt-8">
+                Thank you for shopping with Shree Om Hardware!
+                <button onclick="window.close()" class="block mx-auto mt-4 px-4 py-2 bg-gray-100 text-gray-600 rounded print:hidden hover:bg-gray-200 border border-gray-300">Close Window</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use a short timeout to let images/fonts render, then force native browser print framework
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    </script>
+</body>
+</html>

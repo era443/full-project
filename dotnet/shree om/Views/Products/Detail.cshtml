@@ -1,0 +1,362 @@
+@model shree_om.Models.Product
+
+@{
+    ViewData["Title"] = $"{Model.Name} – Shree Om Hardware";
+    var related = ViewData["RelatedProducts"] as List<shree_om.Models.Product> ?? new();
+    
+
+}
+
+<!-- Use the same Tailwind container structure as React -->
+<div class="bg-gray-50 min-h-screen pb-16 font-sans" style="margin-top: -20px; padding-top: 20px;">
+  <!-- Breadcrumbs -->
+  <div class="bg-white border-b border-gray-100 py-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center text-sm text-gray-400">
+      <a asp-controller="Home" asp-action="Index" class="hover:text-orange-500 transition-colors">Home</a>
+      <i class="fa-solid fa-chevron-right w-4 h-4 mx-2 text-xs"></i>
+      <a asp-controller="Products" asp-action="Index" class="hover:text-orange-500 transition-colors">Products</a>
+      <i class="fa-solid fa-chevron-right w-4 h-4 mx-2 text-xs"></i>
+      <span class="text-gray-900 font-medium truncate max-w-[200px] sm:max-w-md">@Model.Name</span>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <!-- Main Product Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="flex flex-col lg:flex-row">
+        
+        <!-- Left: Image Gallery -->
+        <div class="w-full lg:w-1/2 p-6 lg:border-r border-gray-100">
+          <div class="flex flex-col-reverse md:flex-row gap-4 h-full">
+            <!-- Main View -->
+            <div class="flex-1 rounded-2xl bg-gray-50 flex items-center justify-center p-4 min-h-[400px] lg:min-h-[500px] relative group overflow-hidden">
+              <form asp-controller="Wishlist" asp-action="Add" method="post" class="absolute top-4 right-4 z-10">
+                 <input type="hidden" name="productId" value="@Model.Id" />
+                 <button type="submit" class="p-3 rounded-full transition-all shadow-sm bg-white text-gray-400 border border-gray-100 hover:text-red-500 hover:bg-red-50" title="Wishlist">
+                   <i class="fa-regular fa-heart text-lg"></i>
+                 </button>
+              </form>
+              
+              @if (!string.IsNullOrEmpty(Model.ImageUrl)) {
+                 <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-full object-contain max-h-[500px] transition-transform duration-500 group-hover:scale-105" />
+              } else {
+                 <i class="fa-solid fa-screwdriver-wrench text-6xl text-gray-300"></i>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Product Details -->
+        <div class="w-full lg:w-1/2 p-6 lg:p-10 flex flex-col">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-sm font-semibold tracking-wider text-orange-600 uppercase bg-orange-50 px-2.5 py-1 rounded">
+              @(Model.Category?.Name ?? "Hardware")
+            </span>
+            <span class="text-sm font-medium px-2.5 py-1 rounded flex items-center gap-1 @(Model.Stock > 0 ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600")">
+               @if(Model.Stock > 0) { 
+                   <i class="fa-solid fa-check w-3.5 h-3.5"></i> <text>In Stock</text> 
+               } else { 
+                   <text>Out of Stock</text> 
+               }
+            </span>
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
+            @Model.Name
+          </h1>
+
+          <!-- Rating -->
+          <div class="flex items-center gap-3 mb-6">
+            <div class="flex text-amber-400">
+               @for (int i = 1; i <= 5; i++) {
+                   if (i <= Math.Round(Model.Rating)) { <i class="fa-solid fa-star"></i> }
+                   else { <i class="fa-regular fa-star"></i> }
+               }
+            </div>
+            <span class="text-sm font-medium text-gray-700">@Model.Rating.ToString("0.0") Rating</span>
+            <span class="text-gray-300">•</span>
+            <button onclick="setTab('reviews')" class="text-sm text-gray-500 hover:text-orange-500 hover:underline transition-colors">
+              @Model.ReviewCount Reviews
+            </button>
+          </div>
+
+          <!-- Price -->
+          <div class="mb-8">
+            <div class="flex items-end gap-3">
+              <span class="text-4xl font-extrabold text-gray-900">₹@Model.Price.ToString("N0")</span>
+
+            </div>
+            <p class="text-sm text-gray-500 mt-1">Inclusive of all taxes</p>
+          </div>
+
+          <div class="prose prose-sm text-gray-600 mb-8 border-b border-gray-100 pb-8">
+             <p class="line-clamp-3">@Model.Description</p>
+          </div>
+
+          <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-auto">
+             <input type="hidden" name="productId" value="@Model.Id" />
+             <!-- Quantity Selector -->
+             <div class="mb-6 flex flex-col sm:flex-row sm:items-center gap-4">
+               <div class="flex items-center">
+                 <span class="text-sm font-medium text-gray-700 mr-4">Quantity</span>
+                 <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full w-32 shadow-inner">
+                   <button type="button" onclick="decQty()" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-orange-500 transition-colors">
+                     <i class="fa-solid fa-minus text-xs"></i>
+                   </button>
+                   <input type="number" id="qtyInput" name="quantity" value="1" min="1" max="@Model.Stock" class="flex-1 bg-transparent text-center font-medium text-gray-900 focus:outline-none appearance-none" readonly />
+                   <button type="button" onclick="incQty()" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-orange-500 transition-colors">
+                     <i class="fa-solid fa-plus text-xs"></i>
+                   </button>
+                 </div>
+               </div>
+               @if (Model.Stock > 0 && Model.Stock <= 5)
+               {
+                 <span class="text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                   Only @Model.Stock left in stock!
+                 </span>
+               }
+             </div>
+
+             <!-- Action Buttons -->
+             <div class="flex flex-col sm:flex-row gap-4">
+               @if (Model.Stock > 0)
+               {
+                 <button type="submit" class="flex-1 bg-white border-2 border-orange-500 text-orange-600 font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-orange-50 transition-all duration-200">
+                   <i class="fa-solid fa-cart-shopping w-5 h-5"></i> Add to Cart
+                 </button>
+                 <button type="submit" name="buyNow" value="true" class="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5 transition-all duration-200">
+                   Buy Now
+                 </button>
+               }
+               else
+               {
+                 <button disabled class="w-full bg-gray-100 text-gray-400 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed border border-gray-200">
+                   Currently Unavailable
+                 </button>
+               }
+             </div>
+          </form>
+
+          <!-- Trust Badges -->
+          <div class="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-gray-100">
+            <div class="flex items-center gap-3 text-sm text-gray-600">
+              <div class="p-2 bg-gray-50 rounded-lg text-gray-500">
+                <i class="fa-solid fa-truck-fast text-lg"></i>
+              </div>
+              <span>Fast Delivery</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm text-gray-600">
+              <div class="p-2 bg-gray-50 rounded-lg text-gray-500">
+                <i class="fa-solid fa-shield-halved text-lg"></i>
+              </div>
+               <span>Secure Checkout</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" id="tabs-section">
+      <div class="flex overflow-x-auto no-scrollbar border-b border-gray-100 px-6 pt-4">
+        <button id="tab-btn-description" onclick="setTab('description')" class="px-6 py-4 text-sm font-semibold capitalize whitespace-nowrap border-b-2 transition-colors duration-200 border-orange-500 text-orange-600">Description</button>
+        <button id="tab-btn-specs" onclick="setTab('specs')" class="px-6 py-4 text-sm font-semibold capitalize whitespace-nowrap border-b-2 transition-colors duration-200 border-transparent text-gray-500 hover:text-gray-800">Specifications</button>
+        <button id="tab-btn-reviews" onclick="setTab('reviews')" class="px-6 py-4 text-sm font-semibold capitalize whitespace-nowrap border-b-2 transition-colors duration-200 border-transparent text-gray-500 hover:text-gray-800">Reviews (@Model.ReviewCount)</button>
+      </div>
+
+      <div class="p-8">
+        <!-- Description -->
+        <div id="tab-description" class="block prose prose-orange max-w-none text-gray-600 leading-relaxed">
+           <p>@Model.Description</p>
+        </div>
+
+        <!-- Specs -->
+        <div id="tab-specs" class="hidden max-w-2xl">
+          <h3 class="text-lg font-bold text-gray-900 mb-6">Technical Specifications</h3>
+          <dl class="grid grid-flow-row text-sm">
+             <div class="grid grid-cols-3 py-4 border-b border-gray-100 last:border-0 items-center">
+                 <dt class="text-gray-500 font-medium">Category</dt>
+                 <dd class="col-span-2 text-gray-900 font-semibold">@(Model.Category?.Name ?? "Hardware")</dd>
+             </div>
+             @if (!string.IsNullOrEmpty(Model.Material)) {
+                 <div class="grid grid-cols-3 py-4 border-b border-gray-100 last:border-0 items-center">
+                     <dt class="text-gray-500 font-medium">Material</dt>
+                     <dd class="col-span-2 text-gray-900 font-semibold">@Model.Material</dd>
+                 </div>
+             }
+             @if (!string.IsNullOrEmpty(Model.Finish)) {
+                 <div class="grid grid-cols-3 py-4 border-b border-gray-100 last:border-0 items-center">
+                     <dt class="text-gray-500 font-medium">Finish</dt>
+                     <dd class="col-span-2 text-gray-900 font-semibold">@Model.Finish</dd>
+                 </div>
+             }
+          </dl>
+        </div>
+
+        <!-- Reviews -->
+        <div id="tab-reviews" class="hidden max-w-3xl">
+          <div class="flex items-end justify-between mb-8">
+            <h3 class="text-2xl font-bold text-gray-900">Customer Reviews</h3>
+            <div class="flex items-center gap-2">
+              <span class="text-3xl font-extrabold text-orange-500">@Model.Rating.ToString("0.0")</span>
+              <div class="flex flex-col text-sm text-gray-500 font-medium">
+                <span>out of 5</span>
+                <span>Based on @Model.ReviewCount reviews</span>
+              </div>
+            </div>
+          </div>
+
+          @if (User.Identity != null && User.Identity.IsAuthenticated)
+          {
+             <!-- Review Form -->
+             <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 mb-8">
+                <h4 class="font-bold text-gray-900 mb-4">Write a Review</h4>
+                <form asp-controller="Products" asp-action="AddReview" method="post">
+                   <input type="hidden" name="productId" value="@Model.Id" />
+                   <div class="mb-4">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                      <select name="rating" class="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none bg-white">
+                         <option value="5">5 Stars - Excellent</option>
+                         <option value="4">4 Stars - Good</option>
+                         <option value="3">3 Stars - Average</option>
+                         <option value="2">2 Stars - Poor</option>
+                         <option value="1">1 Star - Terrible</option>
+                      </select>
+                   </div>
+                   <div class="mb-4">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Comment</label>
+                      <textarea name="comment" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none resize-none bg-white" placeholder="Share your experience..."></textarea>
+                   </div>
+                   <button type="submit" class="bg-orange-500 text-white font-medium px-6 py-2 rounded-lg shadow-sm hover:bg-orange-600 transition-colors">Submit Review</button>
+                </form>
+             </div>
+          }
+          else
+          {
+             <div class="bg-orange-50 text-orange-700 p-4 rounded-lg mb-8 text-sm">
+                Please <a asp-controller="Auth" asp-action="Login" class="font-bold underline">log in</a> to write a review.
+             </div>
+          }
+
+          <div class="space-y-6">
+             @if (Model.Reviews == null || !Model.Reviews.Any())
+             {
+                <div class="text-center text-gray-500 py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">No reviews yet. Be the first!</div>
+             }
+             else
+             {
+                 @foreach (var r in Model.Reviews.OrderByDescending(x => x.CreatedAt))
+                 {
+                    <div class="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                       <div class="flex justify-between items-start mb-2">
+                           <div>
+                              <div class="flex items-center gap-2 mb-1">
+                                 <span class="font-bold text-gray-900">@r.CustomerName</span>
+                                 @if (r.IsVerifiedBuyer) {
+                                     <span class="text-[10px] font-bold tracking-wider uppercase bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-check"></i> Verified Buyer</span>
+                                 }
+                              </div>
+                              <div class="flex text-amber-400 text-xs gap-0.5 mt-1">
+                                 @for (int i=0; i<r.Rating; i++) { <i class="fa-solid fa-star"></i> }
+                                 @for (int i=r.Rating; i<5; i++) { <i class="fa-regular fa-star"></i> }
+                              </div>
+                           </div>
+                           <span class="text-xs text-gray-400">@r.CreatedAt.ToString("MMM dd, yyyy")</span>
+                       </div>
+                       <p class="text-gray-600 text-sm leading-relaxed mt-2">@r.Comment</p>
+                    </div>
+                 }
+             }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    @if (related.Any())
+    {
+      <div class="mt-16 mb-8">
+        <div class="flex justify-between items-end mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">You Might Also Like</h2>
+            <p class="text-gray-500 text-sm mt-1">Discover similar products from this category</p>
+          </div>
+          <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@Model.CategoryId" class="group flex items-center gap-1 text-orange-600 font-semibold hover:text-orange-700 transition-colors">
+            View All <i class="fa-solid fa-chevron-right text-xs transition-transform group-hover:translate-x-1"></i>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @foreach (var r in related)
+            {
+                <div class="transition-transform duration-300 hover:-translate-y-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md">
+                    <a asp-action="Detail" asp-route-id="@r.Id" class="block relative w-full aspect-square bg-gray-50 overflow-hidden border-b border-gray-100">
+
+                        
+                        @if (!string.IsNullOrEmpty(r.ImageUrl)) {
+                            <img src="@r.ImageUrl" alt="@r.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        } else {
+                            <div class="w-full h-full flex items-center justify-center"><i class="fa-solid fa-screwdriver-wrench text-3xl text-gray-300"></i></div>
+                        }
+                    </a>
+                    <div class="p-5">
+                       <h3 class="font-bold text-gray-900 truncate mb-1">@r.Name</h3>
+                       <div class="flex items-center gap-2 mb-3">
+                           <span class="text-lg font-extrabold text-gray-900">₹@r.Price.ToString("N0")</span>
+
+                       </div>
+                       <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                          <input type="hidden" name="productId" value="@r.Id" />
+                          <input type="hidden" name="quantity" value="1" />
+                          <button type="submit" class="w-full bg-orange-50 text-orange-600 font-semibold py-2.5 rounded-lg border border-orange-100 hover:bg-orange-500 hover:text-white transition-all duration-200">
+                              <i class="fa-solid fa-cart-shopping mr-1"></i> Add
+                          </button>
+                       </form>
+                    </div>
+                </div>
+            }
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    function incQty() {
+        var inp = document.getElementById("qtyInput");
+        var max = parseInt(inp.max) || 999;
+        var v = parseInt(inp.value) || 1;
+        if(v < max) inp.value = v + 1;
+    }
+    function decQty() {
+        var inp = document.getElementById("qtyInput");
+        var v = parseInt(inp.value) || 1;
+        if(v > 1) inp.value = v - 1;
+    }
+    
+    function setTab(tabName) {
+        document.getElementById("tab-description").classList.add("hidden");
+        document.getElementById("tab-specs").classList.add("hidden");
+        document.getElementById("tab-reviews").classList.add("hidden");
+        
+        document.getElementById("tab-btn-description").classList.replace("border-orange-500", "border-transparent");
+        document.getElementById("tab-btn-description").classList.replace("text-orange-600", "text-gray-500");
+        document.getElementById("tab-btn-description").classList.remove("hover:text-gray-800");
+
+        document.getElementById("tab-btn-specs").classList.replace("border-orange-500", "border-transparent");
+        document.getElementById("tab-btn-specs").classList.replace("text-orange-600", "text-gray-500");
+        document.getElementById("tab-btn-specs").classList.remove("hover:text-gray-800");
+
+        document.getElementById("tab-btn-reviews").classList.replace("border-orange-500", "border-transparent");
+        document.getElementById("tab-btn-reviews").classList.replace("text-orange-600", "text-gray-500");
+        document.getElementById("tab-btn-reviews").classList.remove("hover:text-gray-800");
+        
+        document.getElementById("tab-" + tabName).classList.remove("hidden");
+        var btn = document.getElementById("tab-btn-" + tabName);
+        btn.classList.replace("border-transparent", "border-orange-500");
+        btn.classList.replace("text-gray-500", "text-orange-600");
+    }
+  </script>
+}

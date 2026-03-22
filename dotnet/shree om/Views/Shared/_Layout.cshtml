@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Shree Om Hardware – Premium door handles, locks, hinges and hardware parts. Made in India." />
+    <title>@ViewData["Title"] - Shree Om Hardware</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Tailwind CSS (No preflight to avoid breaking site.css) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: {
+          preflight: false,
+        }
+      }
+    </script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="site-navbar">
+        <div class="inner">
+            <!-- Logo -->
+            <a asp-controller="Home" asp-action="Index" class="navbar-logo">
+                <div class="logo-box">SO</div>
+                <div class="brand-text">
+                    <div class="name">Shree Om</div>
+                    <div class="sub">Hardware</div>
+                </div>
+            </a>
+
+            <!-- Search -->
+            <form asp-controller="Products" asp-action="Index" method="get" class="navbar-search m-0" style="margin: 0;">
+                <span class="search-icon"><i class="fa fa-search"></i></span>
+                <input type="text" name="search" placeholder="Search for door handles, locks, hinges..." id="navSearch" />
+            </form>
+
+            <!-- Nav Links -->
+            <div class="navbar-links flex items-center gap-6">
+                <a asp-controller="Home" asp-action="Index">Home</a>
+                <a asp-controller="Products" asp-action="Index">Products</a>
+                <a asp-controller="About" asp-action="Index">About</a>
+                <a asp-controller="Contact" asp-action="Index">Contact</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Dashboard" style="color: #ea580c; font-weight: 700; border: 1px solid #ea580c; padding: 4px 12px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-shield-halved"></i> Admin Panel
+                    </a>
+                }
+            </div>
+
+            <!-- Icons + Auth -->
+            <div class="navbar-icons">
+                <!-- Cart is visible to everyone -->
+                <a asp-controller="Cart" asp-action="Index" title="Cart" class="position-relative" style="margin-right: 15px;">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; display: none;">0</span>
+                </a>
+                
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Wishlist" asp-action="Index" title="Wishlist"><i class="fa-regular fa-heart"></i></a>
+                    <!-- Divider -->
+                    <div class="nav-auth-divider"></div>
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-wrap">
+                        <button class="profile-btn" type="button" id="profileDropBtn" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-regular fa-circle-user"></i>
+                            <span class="profile-name">@User.Identity.Name</span>
+                            <i class="fa-solid fa-chevron-down profile-chevron"></i>
+                        </button>
+                        <div class="profile-dropdown" id="profileDropMenu">
+                            <div class="profile-drop-header">
+                                <div class="profile-drop-avatar"><i class="fa-solid fa-user"></i></div>
+                                <div>
+                                    <div class="profile-drop-name">@User.Identity.Name</div>
+                                    <div class="profile-drop-email">@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</div>
+                                </div>
+                            </div>
+                            <hr class="drop-divider" />
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Admin" asp-action="Dashboard" class="drop-item text-orange-600 font-bold"><i class="fa-solid fa-shield-halved"></i> Admin Panel</a>
+                                <hr class="drop-divider" />
+                            }
+                            <a asp-controller="Dashboard" asp-action="Profile" class="drop-item"><i class="fa-regular fa-user"></i> My Profile</a>
+                            <a asp-controller="Dashboard" asp-action="Orders" class="drop-item"><i class="fa-solid fa-bag-shopping"></i> My Orders</a>
+                            <a asp-controller="Wishlist" asp-action="Index" class="drop-item"><i class="fa-regular fa-heart"></i> Wishlist</a>
+                            <hr class="drop-divider" />
+                            <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="drop-item drop-logout">
+                                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn-login-nav">Login</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn-register-nav">Register</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Page Content -->
+    <div class="page-content">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <!-- Brand -->
+            <div class="footer-brand">
+                <div class="logo-row">
+                    <div class="logo-box">SO</div>
+                    <div>
+                        <div class="brand-name">Shree Om Hardware</div>
+                        <div class="brand-tagline">Premium Quality</div>
+                    </div>
+                </div>
+                <p>Manufacturing premium quality door handles, locks, hinges, and hardware parts since 2010.</p>
+                <div class="social-links">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a asp-controller="About" asp-action="Index">About Us</a></li>
+                    <li><a asp-controller="Products" asp-action="Index">Products</a></li>
+                    <li><a asp-controller="Contact" asp-action="Index">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <ul class="footer-contact">
+                    <li>
+                        <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                        <span>123, Industrial Area<br />Rajkot, Gujarat &ndash; 360001<br />India</span>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fa-solid fa-phone"></i></span>
+                        <span>+91-98765-43210</span>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fa-solid fa-envelope"></i></span>
+                        <span>info@shreeomhardware.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            &copy; 2026 Shree Om Hardware. All rights reserved. Made in India with <span class="heart">❤</span>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        // Profile dropdown toggle
+        (function () {
+            var btn  = document.getElementById('profileDropBtn');
+            var wrap = btn && btn.closest('.profile-dropdown-wrap');
+            if (!btn || !wrap) return;
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                wrap.classList.toggle('open');
+                btn.setAttribute('aria-expanded', wrap.classList.contains('open'));
+            });
+            document.addEventListener('click', function () {
+                wrap.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+        })();
+
+        // Load cart count
+        fetch('/Cart/GetCartCount')
+            .then(res => res.json())
+            .then(count => {
+                const badge = document.getElementById('cartBadge');
+                if (count > 0 && badge) {
+                    badge.innerText = count;
+                    badge.style.display = 'inline-block';
+                }
+            })
+            .catch(err => console.error('Error fetching cart count:', err));
+    </script>
+</body>
+</html>
+
